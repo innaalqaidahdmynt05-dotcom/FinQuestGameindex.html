@@ -1,828 +1,206 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinQuest Pro - Playable UI & Simulator Prototype</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-dark: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --card-border: rgba(255, 255, 255, 0.1);
-            --primary: #3b82f6;
-            --primary-glow: rgba(59, 130, 246, 0.4);
-            --accent-green: #10b981;
-            --accent-purple: #8b5cf6;
-            --accent-amber: #f59e0b;
-            --accent-rose: #f43f5e;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Awardee CFP Quest</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: #0b0f19; color: #f8fafc; margin: 0; padding: 20px; display: flex; justify-content: center; }
+    .game-container { width: 100%; max-width: 480px; background: #111827; border-radius: 16px; padding: 20px; border: 1px solid #1f2937; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    
+    /* Header Status Bar */
+    .status-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #1f2937; padding: 12px; border-radius: 12px; margin-bottom: 20px; }
+    .status-item { font-size: 0.85rem; color: #9ca3af; }
+    .status-val { font-size: 1.1rem; font-weight: bold; color: #38bdf8; margin-top: 2px; }
+    .status-val.danger { color: #f87171; }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
+    /* Allocation Sliders */
+    .bucket-card { background: #1e293b; padding: 14px; border-radius: 10px; margin-bottom: 12px; border-left: 4px solid #3b82f6; }
+    .bucket-card h4 { margin: 0 0 6px 0; font-size: 0.95rem; }
+    .bucket-card p { margin: 0 0 10px 0; font-size: 0.75rem; color: #94a3b8; }
+    input[type=range] { width: 100%; accent-color: #38bdf8; }
 
-        body {
-            background: radial-gradient(circle at top right, #1e1b4b, #0f172a 60%);
-            color: var(--text-main);
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+    .btn-main { width: 100%; background: #2563eb; color: white; border: none; padding: 14px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    .btn-main:hover { background: #1d4ed8; }
 
-        .game-container {
-            width: 100%;
-            max-width: 1200px;
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--card-border);
-            border-radius: 24px;
-            padding: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            display: grid;
-            grid-template-columns: 1fr 340px;
-            gap: 24px;
-        }
-
-        @media (max-width: 992px) {
-            .game-container {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* HEADER & STATUS BAR */
-        .header {
-            grid-column: 1 / -1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            padding: 16px 24px;
-            border-radius: 16px;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .brand-logo {
-            width: 42px;
-            height: 42px;
-            background: linear-gradient(135deg, var(--primary), var(--accent-purple));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 20px;
-            box-shadow: 0 0 15px var(--primary-glow);
-        }
-
-        .brand-title {
-            font-weight: 800;
-            font-size: 20px;
-            letter-spacing: -0.5px;
-            background: linear-gradient(to right, #ffffff, #93c5fd);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .brand-sub {
-            font-size: 11px;
-            color: var(--accent-amber);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .status-pill {
-            display: flex;
-            gap: 20px;
-            background: rgba(15, 23, 42, 0.6);
-            padding: 8px 16px;
-            border-radius: 30px;
-            border: 1px solid var(--card-border);
-        }
-
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .stat-label {
-            font-size: 10px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-weight: 700;
-        }
-
-        .stat-val {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        /* MAIN CONTENT AREA */
-        .main-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        /* WALLET GRID */
-        .section-title {
-            font-size: 14px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .wallet-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
-
-        .wallet-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            padding: 16px;
-            border-radius: 16px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .wallet-card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .wallet-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-        }
-
-        .wallet-survival::before { background: var(--primary); }
-        .wallet-social::before { background: var(--accent-purple); }
-        .wallet-emergency::before { background: var(--accent-amber); }
-        .wallet-future::before { background: var(--accent-green); }
-
-        .wallet-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .wallet-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-
-        .wallet-amount {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--text-main);
-        }
-
-        .wallet-slider {
-            width: 100%;
-            margin-top: 10px;
-            accent-color: var(--primary);
-        }
-
-        /* EVENT SCENARIO CARD */
-        .event-card {
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            border-radius: 20px;
-            padding: 20px;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .event-badge {
-            display: inline-block;
-            background: rgba(59, 130, 246, 0.2);
-            color: #93c5fd;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 20px;
-            margin-bottom: 12px;
-            border: 1px solid rgba(59, 130, 246, 0.3);
-        }
-
-        .event-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .event-desc {
-            font-size: 13px;
-            color: var(--text-muted);
-            line-height: 1.5;
-            margin-bottom: 20px;
-        }
-
-        .choice-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .btn-choice {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--card-border);
-            color: var(--text-main);
-            padding: 12px 16px;
-            border-radius: 12px;
-            text-align: left;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .btn-choice:hover {
-            background: rgba(59, 130, 246, 0.15);
-            border-color: var(--primary);
-            transform: translateX(4px);
-        }
-
-        .choice-impact {
-            font-size: 11px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 6px;
-        }
-
-        .impact-plus { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
-        .impact-minus { background: rgba(244, 63, 94, 0.2); color: #fca5a5; }
-
-        /* SIDEBAR / PYRAMID PROGRESSION */
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .pyramid-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            padding: 20px;
-            border-radius: 20px;
-        }
-
-        .pyramid-container {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 14px;
-        }
-
-        .pyramid-tier {
-            padding: 10px;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 11px;
-            font-weight: 700;
-            border: 1px solid var(--card-border);
-            transition: all 0.3s ease;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .tier-locked {
-            background: rgba(15, 23, 42, 0.5);
-            color: var(--text-muted);
-            opacity: 0.6;
-        }
-
-        .tier-unlocked {
-            background: linear-gradient(90deg, rgba(16, 185, 129, 0.2), rgba(59, 130, 246, 0.2));
-            border-color: var(--accent-green);
-            color: #ffffff;
-            box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
-        }
-
-        .tier-5 { width: 60%; margin: 0 auto; }
-        .tier-4 { width: 70%; margin: 0 auto; }
-        .tier-3 { width: 80%; margin: 0 auto; }
-        .tier-2 { width: 90%; margin: 0 auto; }
-        .tier-1 { width: 100%; margin: 0 auto; }
-
-        .partner-box {
-            background: rgba(59, 130, 246, 0.08);
-            border: 1px dashed var(--primary);
-            padding: 14px;
-            border-radius: 14px;
-            margin-top: 14px;
-        }
-
-        .partner-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--primary);
-            text-transform: uppercase;
-            margin-bottom: 4px;
-        }
-
-        .partner-desc {
-            font-size: 11px;
-            color: var(--text-muted);
-            line-height: 1.4;
-        }
-
-        /* MORALE BAR */
-        .morale-container {
-            margin-top: 10px;
-        }
-
-        .morale-bar-bg {
-            width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 6px;
-        }
-
-        .morale-bar-fill {
-            height: 100%;
-            width: 80%;
-            background: linear-gradient(90deg, var(--accent-amber), var(--accent-green));
-            transition: width 0.5s ease;
-        }
-
-        /* CONTROLS & ACTION BUTTONS */
-        .action-bar {
-            display: flex;
-            gap: 12px;
-            margin-top: 10px;
-        }
-
-        .btn-primary {
-            flex: 1;
-            background: linear-gradient(135deg, var(--primary), var(--accent-purple));
-            border: none;
-            color: white;
-            padding: 14px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px var(--primary-glow);
-            transition: all 0.2s ease;
-            text-align: center;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px var(--primary-glow);
-        }
-
-        /* LOG LIST */
-        .log-box {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            padding: 14px;
-            border-radius: 16px;
-            max-height: 150px;
-            overflow-y: auto;
-            font-size: 11px;
-            color: var(--text-muted);
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .log-item {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            padding-bottom: 4px;
-        }
-    </style>
+    /* Modal Style (Persis Gambar) */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .modal-card { background: #1e293b; border-radius: 16px; padding: 20px; width: 100%; max-width: 400px; border: 1px solid #334155; }
+    .modal-header { font-size: 1.1rem; font-weight: bold; color: #38bdf8; margin-bottom: 8px; }
+    .modal-desc { font-size: 0.9rem; color: #cbd5e1; line-height: 1.4; margin-bottom: 20px; }
+    .modal-btn { width: 100%; padding: 12px; margin-bottom: 8px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
+    .btn-danger { background: #dc2626; color: white; }
+    .btn-secondary { background: #475569; color: white; }
+    .btn-success { background: #16a34a; color: white; }
+    .hidden { display: none !important; }
+  </style>
 </head>
 <body>
 
-    <div class="game-container">
-        <!-- HEADER -->
-        <div class="header">
-            <div class="brand">
-                <div class="brand-logo">F</div>
-                <div>
-                    <div class="brand-title">FINQUEST PRO</div>
-                    <div class="brand-sub">CFP Pyramid Simulator Engine</div>
-                </div>
-            </div>
+<div class="game-container">
+  <h2>Awardee Budget Quest</h2>
+  <p style="font-size: 0.8rem; color: #94a3b8;">Target: Bertahan 6 Bulan tanpa terjerat utang Pinjol!</p>
 
-            <div class="status-pill">
-                <div class="stat-item">
-                    <span class="stat-label">Bulan Ke</span>
-                    <span class="stat-val" id="val-month">1 / 12</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Total Kekayaan</span>
-                    <span class="stat-val" id="val-wealth" style="color:#6ee7b7">Rp 3.000.000</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">CFP Score</span>
-                    <span class="stat-val" id="val-score" style="color:#93c5fd">65 / 100</span>
-                </div>
-            </div>
-        </div>
+  <div class="status-bar">
+    <div class="status-item">Bulan: <div id="ui-month" class="status-val">1 / 6</div></div>
+    <div class="status-item">Sisa Uang Saku: <div id="ui-cash" class="status-val">Rp900.000</div></div>
+    <div class="status-item">Dana Darurat: <div id="ui-emergency" class="status-val">Rp0</div></div>
+    <div class="status-item">Utang Pinjol: <div id="ui-debt" class="status-val danger">Rp0</div></div>
+  </div>
 
-        <!-- MAIN PANEL -->
-        <div class="main-panel">
-            <!-- WALLETS -->
-            <div>
-                <div class="section-title">
-                    <span>Pos Alokasi Anggaran (Budgeting Wallets)</span>
-                    <span style="font-size:11px; color:var(--accent-amber)">Pendapatan: Rp 3.000.000/bln</span>
-                </div>
-                <div class="wallet-grid">
-                    <div class="wallet-card wallet-survival">
-                        <div class="wallet-header">
-                            <span class="wallet-name">1. Survival (Kebutuhan Pokok)</span>
-                            <span style="font-size:10px; color:#93c5fd">Ideal: 50%</span>
-                        </div>
-                        <div class="wallet-amount" id="amt-survival">Rp 1.500.000</div>
-                    </div>
-
-                    <div class="wallet-card wallet-social">
-                        <div class="wallet-header">
-                            <span class="wallet-name">2. Social & Lifestyle</span>
-                            <span style="font-size:10px; color:#c084fc">Ideal: 20%</span>
-                        </div>
-                        <div class="wallet-amount" id="amt-social">Rp 600.000</div>
-                    </div>
-
-                    <div class="wallet-card wallet-emergency">
-                        <div class="wallet-header">
-                            <span class="wallet-name">3. Dana Darurat (Emergency)</span>
-                            <span style="font-size:10px; color:#fcd34d">Target: Rp 4.500.000</span>
-                        </div>
-                        <div class="wallet-amount" id="amt-emergency">Rp 600.000</div>
-                    </div>
-
-                    <div class="wallet-card wallet-future">
-                        <div class="wallet-header">
-                            <span class="wallet-name">4. Future & Investasi</span>
-                            <span style="font-size:10px; color:#6ee7b7">Ideal: 10% - 20%</span>
-                        </div>
-                        <div class="wallet-amount" id="amt-future">Rp 300.000</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- EVENT SCENARIO -->
-            <div class="event-card">
-                <span class="event-badge" id="event-tag">SKENARIO BULAN 1: PEMILIKAN REKENING & BUDGETING</span>
-                <div class="event-title" id="event-title">Memulai Pengaturan Pos Keuangan Pertama</div>
-                <div class="event-desc" id="event-desc">
-                    Kamu baru saja menerima gaji/uang saku bulan ini. Teman-teman kamu mengaitkan promo diskon gadget terbaru dan ajakan nongkrong di café kekinian. Bagaimana kamu mengalokasikan anggaran bulan ini?
-                </div>
-
-                <div class="choice-list" id="choice-container">
-                    <!-- Choices will be rendered via JS -->
-                </div>
-            </div>
-
-            <!-- ACTION LOG -->
-            <div>
-                <div class="section-title">Riwayat Transaksi & Peristiwa</div>
-                <div class="log-box" id="log-box">
-                    <div class="log-item">▶ Game dimulai. Karakter: First Jobber / Mahasiswa. Pendapatan Rp 3.000.000.</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- SIDEBAR -->
-        <div class="sidebar">
-            <!-- PIRAMIDA CFP PROGRESSION -->
-            <div class="pyramid-card">
-                <div class="section-title">Piramida Keuangan CFP</div>
-                <div class="pyramid-container">
-                    <div class="pyramid-tier tier-5 tier-locked" id="tier-5">
-                        L5: Investasi & Wealth Growth 🔒
-                    </div>
-                    <div class="pyramid-tier tier-4 tier-locked" id="tier-4">
-                        L4: Proteksi Asuransi & Risiko 🔒
-                    </div>
-                    <div class="pyramid-tier tier-3 tier-locked" id="tier-3">
-                        L3: Dana Darurat Likuid 🔒
-                    </div>
-                    <div class="pyramid-tier tier-2 tier-unlocked" id="tier-2">
-                        L2: Cashflow & Budgeting 50/30/20 ✓
-                    </div>
-                    <div class="pyramid-tier tier-1 tier-unlocked" id="tier-1">
-                        L1: Mindset & Arus Kas Dasar ✓
-                    </div>
-                </div>
-
-                <!-- MORALE GAUGE -->
-                <div class="morale-container">
-                    <div class="section-title" style="margin-top:16px;">
-                        <span>Indikator Momentum (Morale)</span>
-                        <span id="val-morale" style="color:var(--accent-amber)">80%</span>
-                    </div>
-                    <div class="morale-bar-bg">
-                        <div class="morale-bar-fill" id="bar-morale"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- INTEGRASI MITRA KEUANGAN -->
-            <div class="partner-box">
-                <div class="partner-title">💡 Integrasi Produk Mitra Keuangan</div>
-                <div class="partner-desc" id="partner-info">
-                    <strong>Bank Partner Pocket Account:</strong> Otomatisasi pemisahan pos Survival & Emergency Fund langsung dari aplikasi Mobile Banking mitra!
-                </div>
-            </div>
-
-            <!-- SIMULATION CONTROL -->
-            <button class="btn-primary" onclick="resetGame()">↺ Reset Simulasi</button>
-        </div>
+  <div id="allocation-panel">
+    <h3>Alokasi Awal Bulan</h3>
+    
+    <div class="bucket-card" style="border-color: #22c55e;">
+      <h4>1. Survival (Makan & Transport Min. Rp450rb)</h4>
+      <p>Kebutuhan dasar fisik agar tidak sakit.</p>
+      <input type="range" id="input-survival" min="300000" max="700000" step="50000" value="500000" oninput="updateAllocation()">
+      <span id="val-survival">Rp500.000</span>
     </div>
 
-    <script>
-        // GAME STATE ENGINE
-        let state = {
-            month: 1,
-            income: 3000000,
-            morale: 80,
-            wallets: {
-                survival: 1500000,
-                social: 600000,
-                emergency: 600000,
-                future: 300000
-            },
-            insuranceActive: false,
-            emergencyTarget: 4500000,
-            cfpScore: 65,
-            history: []
-        };
+    <div class="bucket-card" style="border-color: #eab308;">
+      <h4>2. Gaya Hidup & Social (Nongkrong & Hobi)</h4>
+      <p>Menjaga kesehatan mental dan relasi teman.</p>
+      <input type="range" id="input-lifestyle" min="0" max="400000" step="25000" value="250000" oninput="updateAllocation()">
+      <span id="val-lifestyle">Rp250.000</span>
+    </div>
 
-        const events = [
-            {
-                month: 1,
-                tag: "SKENARIO BULAN 1: PENGATURAN POS ANGGARAN",
-                title: "Gaji Pertama & Diskon Gadget Impian",
-                desc: "Kamu mendapatkan gaji pertama Rp3.000.000. Ada promo gadget seharga Rp1.200.000 dengan sistem cicilan, namun kamu juga harus mengamankan pos Survival & Dana Darurat.",
-                choices: [
-                    {
-                        text: "Disiplin alokasi 50/20/20/10 (Tabung Dana Darurat & Investasi Dini)",
-                        impact: "Emergency +Rp600k | Morale Stabil",
-                        impactClass: "impact-plus",
-                        action: () => {
-                            state.wallets.emergency += 600000;
-                            state.wallets.future += 300000;
-                            state.morale = Math.min(100, state.morale + 5);
-                            addLog("Memilih alokasi disiplin 50/20/20/10. Dana darurat bertambah Rp600.000.");
-                        }
-                    },
-                    {
-                        text: "Beli Gadget Promo (Pangkas Pos Dana Darurat & Investasi)",
-                        impact: "Social -Rp1.200k | Morale +15%",
-                        impactClass: "impact-minus",
-                        action: () => {
-                            state.wallets.social -= 400000;
-                            state.wallets.emergency += 100000;
-                            state.morale = Math.min(100, state.morale + 15);
-                            addLog("Membeli gadget promo. Pengeluaran sosial meningkat, alokasi dana darurat minim.");
-                        }
-                    }
-                ],
-                partner: "Bank Partner Pocket Account: Gunakan fitur Auto-Pocket untuk memisahkan gaji secara otomatis saat masuk."
-            },
-            {
-                month: 2,
-                tag: "SKENARIO BULAN 2: BLACK SWAN EVENT (DARURAT)",
-                title: "Laptop Kerja Mendadak Rusak / Sakit",
-                desc: "Laptop utama kamu mengalami kerusakan motherboard dan membutuhkan biaya perbaikan darurat sebesar Rp1.500.000.",
-                choices: [
-                    {
-                        text: "Gunakan Pos Dana Darurat (Emergency Fund)",
-                        impact: "Emergency -Rp1.500k | Morale Aman",
-                        impactClass: "impact-plus",
-                        action: () => {
-                            if(state.wallets.emergency >= 1500000) {
-                                state.wallets.emergency -= 1500000;
-                                addLog("Membayar perbaikan laptop dari Dana Darurat. Keuangan tetap stabil.");
-                            } else {
-                                let deficit = 1500000 - state.wallets.emergency;
-                                state.wallets.emergency = 0;
-                                state.wallets.social = Math.max(0, state.wallets.social - deficit);
-                                state.morale -= 20;
-                                addLog("Dana darurat tidak cukup! Terpaksa memotong pos lifestyle & mengalami stress (-20 Morale).");
-                            }
-                        }
-                    },
-                    {
-                        text: "Pinjam dari Pos Survival & Kebutuhan Pokok",
-                        impact: "Survival Drop | Morale -25%",
-                        impactClass: "impact-minus",
-                        action: () => {
-                            state.wallets.survival -= 1000000;
-                            state.morale -= 25;
-                            addLog("Menggunakan dana kebutuhan pokok. Mengurangi kualitas makanan & kesehatan bulan ini.");
-                        }
-                    }
-                ],
-                partner: "Mitra Bank High-Yield Liquid Savings: Simpan dana darurat di RDPU/Deposito yang cair dalam 24 jam."
-            },
-            {
-                month: 3,
-                tag: "SKENARIO BULAN 3: PROTEKSI RISIKO & ASURANSI",
-                title: "Penawaran Asuransi Kesehatan Micro (Shield)",
-                desc: "Mitra Asuransi menawarkan produk proteksi kesehatan seharga premi Rp150.000/bulan untuk melindungi dari biaya rawat inap mahal.",
-                choices: [
-                    {
-                        text: "Aktifkan Shield Asuransi (Proteksi Level 4 CFP)",
-                        impact: "Premi -Rp150k/bln | Proteksi Aktif",
-                        impactClass: "impact-plus",
-                        action: () => {
-                            state.insuranceActive = true;
-                            state.wallets.future -= 150000;
-                            state.morale += 10;
-                            addLog("Mengaktifkan Proteksi Asuransi Kesehatan. Level 4 Piramida CFP Terbuka!");
-                        }
-                    },
-                    {
-                        text: "Lewati Asuransi (Risiko Ditanggung Sendiri)",
-                        impact: "Hemat Premi | Risiko Tinggi",
-                        impactClass: "impact-minus",
-                        action: () => {
-                            addLog("Menolak proteksi asuransi. Potensi kebocoran keuangan jika terjadi wabah/sakit.");
-                        }
-                    }
-                ],
-                partner: "Mitra Asuransi Kesehatan: Dapatkan polis instant claim langsung terkoneksi dengan aplikasi FinQuest."
-            },
-            {
-                month: 4,
-                tag: "SKENARIO BULAN 4: WEALTH GROWTH & INVESTASI",
-                title: "Peluang Investasi Reksa Dana / SBN Mitra",
-                desc: "Pasar sedang mengalami siklus tumbuh. Mitra Manajer Investasi memberikan akses Reksa Dana Campuran & SBN dengan potensi return 8-10% p.a.",
-                choices: [
-                    {
-                        text: "Investasikan Pos Future ke Reksa Dana Mitra (Level 5)",
-                        impact: "Future Growth +10% | Passive Income",
-                        impactClass: "impact-plus",
-                        action: () => {
-                            state.wallets.future += 500000;
-                            state.morale += 10;
-                            addLog("Menempatkan Rp500.000 ke Reksa Dana Mitra. Portofolio investasi tumbuh!");
-                        }
-                    },
-                    {
-                        text: "Simpan Semua dalam Bentuk Cash di Rekening",
-                        impact: "No Return | Tergerus Inflasi",
-                        impactClass: "impact-minus",
-                        action: () => {
-                            addLog("Membiarkan dana idle di rekening tunai.");
-                        }
-                    }
-                ],
-                partner: "Mitra Investment App: Integrasi RDN otomatis untuk investasi Reksa Dana & SBN bebas biaya transaksi."
-            }
-        ];
+    <div class="bucket-card" style="border-color: #3b82f6;">
+      <h4>3. Masa Depan & Darurat (CFP Level 2 & 3)</h4>
+      <p>Tabungan pelindung jika musibah terjadi.</p>
+      <input type="range" id="input-future" min="0" max="300000" step="25000" value="150000" oninput="updateAllocation()">
+      <span id="val-future">Rp150.000</span>
+    </div>
 
-        function updateUI() {
-            // Update Headers & Status
-            document.getElementById('val-month').innerText = `${state.month} / 12`;
-            let totalWealth = state.wallets.survival + state.wallets.social + state.wallets.emergency + state.wallets.future;
-            document.getElementById('val-wealth').innerText = `Rp ${totalWealth.toLocaleString('id-ID')}`;
-            
-            // Calculate CFP Score
-            let emergencyRatio = Math.min(1.0, state.wallets.emergency / state.emergencyTarget);
-            let protScore = state.insuranceActive ? 20 : 0;
-            let growthScore = Math.min(20, (state.wallets.future / 1000000) * 20);
-            state.cfpScore = Math.round((emergencyRatio * 40) + protScore + growthScore + (state.morale * 0.2));
-            document.getElementById('val-score').innerText = `${state.cfpScore} / 100`;
+    <button class="btn-main" onclick="submitAllocation()">Kunci Anggaran Bulan Ini</button>
+  </div>
+</div>
 
-            // Update Wallets
-            document.getElementById('amt-survival').innerText = `Rp ${state.wallets.survival.toLocaleString('id-ID')}`;
-            document.getElementById('amt-social').innerText = `Rp ${state.wallets.social.toLocaleString('id-ID')}`;
-            document.getElementById('amt-emergency').innerText = `Rp ${state.wallets.emergency.toLocaleString('id-ID')}`;
-            document.getElementById('amt-future').innerText = `Rp ${state.wallets.future.toLocaleString('id-ID')}`;
+<!-- Modal Event (Tampilan persis screenshot) -->
+<div id="event-modal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <div id="modal-title" class="modal-header">Kejadian Bulan Ini</div>
+    <div id="modal-desc" class="modal-desc">Deskripsi event akan muncul di sini...</div>
+    <div id="modal-actions"></div>
+  </div>
+</div>
 
-            // Update Morale
-            document.getElementById('val-morale').innerText = `${state.morale}%`;
-            document.getElementById('bar-morale').style.width = `${state.morale}%`;
+<script>
+  let state = { month: 1, cash: 900000, emergency: 0, debt: 0, survival: 500000, lifestyle: 250000, future: 150000 };
 
-            // Update Pyramid Tiers
-            if(state.wallets.emergency >= 3000000) {
-                let t3 = document.getElementById('tier-3');
-                t3.className = "pyramid-tier tier-3 tier-unlocked";
-                t3.innerText = "L3: Dana Darurat Likuid ✓";
-            }
-            if(state.insuranceActive) {
-                let t4 = document.getElementById('tier-4');
-                t4.className = "pyramid-tier tier-4 tier-unlocked";
-                t4.innerText = "L4: Proteksi Asuransi & Risiko ✓";
-            }
-            if(state.wallets.future >= 1000000 && state.insuranceActive && state.wallets.emergency >= 3000000) {
-                let t5 = document.getElementById('tier-5');
-                t5.className = "pyramid-tier tier-5 tier-unlocked";
-                t5.innerText = "L5: Investasi & Wealth Growth ✓";
-            }
+  const events = {
+    1: {
+      title: "Kejadian Bulan 1: Iming-iming Slot Online",
+      desc: "Sebuah iklan menawarkan modal Rp50.000 bisa jadi Rp500.000. Kamu sedang tergiur ingin membeli sepatu baru.",
+      options: [
+        { text: "Coba Main (Bayar Rp50.000)", class: "btn-danger", action: () => handleJudol(true) },
+        { text: "Hiraukan & Fokus Kuliah", class: "btn-secondary", action: () => handleJudol(false) }
+      ]
+    },
+    2: {
+      title: "Kejadian Bulan 2: Ban Motor Bocor & Servis",
+      desc: "Ban motor meledak di jalan menuju kampus. Biaya ganti ban Rp100.000.",
+      options: [
+        { text: "Bayar Pakai Dana Darurat", class: "btn-success", action: () => handleEmergency(true) },
+        { text: "Pinjam Pinjol Cepat Cair (Bunga 30%)", class: "btn-danger", action: () => handleEmergency(false) }
+      ]
+    }
+  };
 
-            // Render Current Event Card
-            let currentEvt = events[(state.month - 1) % events.length];
-            document.getElementById('event-tag').innerText = currentEvt.tag;
-            document.getElementById('event-title').innerText = currentEvt.title;
-            document.getElementById('event-desc').innerText = currentEvt.desc;
-            document.getElementById('partner-info').innerText = currentEvt.partner;
+  function updateAllocation() {
+    state.survival = parseInt(document.getElementById('input-survival').value);
+    state.lifestyle = parseInt(document.getElementById('input-lifestyle').value);
+    state.future = parseInt(document.getElementById('input-future').value);
 
-            let choiceContainer = document.getElementById('choice-container');
-            choiceContainer.innerHTML = "";
-            currentEvt.choices.forEach((choice, idx) => {
-                let btn = document.createElement('button');
-                btn.className = "btn-choice";
-                btn.innerHTML = `
-                    <span>${choice.text}</span>
-                    <span class="choice-impact ${choice.impactClass}">${choice.impact}</span>
-                `;
-                btn.onclick = () => {
-                    choice.action();
-                    nextTurn();
-                };
-                choiceContainer.appendChild(btn);
-            });
-        }
+    document.getElementById('val-survival').innerText = "Rp" + state.survival.toLocaleString('id-ID');
+    document.getElementById('val-lifestyle').innerText = "Rp" + state.lifestyle.toLocaleString('id-ID');
+    document.getElementById('val-future').innerText = "Rp" + state.future.toLocaleString('id-ID');
+  }
 
-        function nextTurn() {
-            state.month++;
-            if(state.month > 12) {
-                alert(`🎉 SIMULASI SELESAI!
+  function submitAllocation() {
+    let total = state.survival + state.lifestyle + state.future;
+    if(total > state.cash) {
+      alert("Total alokasi melebihi sisa uang sakumu!");
+      return;
+    }
+    state.emergency += state.future;
+    showEvent(state.month);
+  }
 
-Skor Finansial CFP Anda: ${state.cfpScore}/100
-Total Kekayaan Akumulasi: Rp ${ (state.wallets.survival + state.wallets.social + state.wallets.emergency + state.wallets.future).toLocaleString('id-ID') }
+  function showEvent(m) {
+    let ev = events[m] || {
+      title: `Evaluasi Bulan ${m}`,
+      desc: "Bulan berjalan lancar tanpa krisis besar.",
+      options: [{ text: "Lanjut ke Bulan Berikutnya", class: "btn-success", action: () => nextMonth() }]
+    };
 
-Terima kasih telah mencobanya!`);
-                resetGame();
-                return;
-            }
-            updateUI();
-        }
+    document.getElementById('modal-title').innerText = ev.title;
+    document.getElementById('modal-desc').innerText = ev.desc;
+    let actionsDiv = document.getElementById('modal-actions');
+    actionsDiv.innerHTML = "";
 
-        function addLog(text) {
-            let logBox = document.getElementById('log-box');
-            let item = document.createElement('div');
-            item.className = "log-item";
-            item.innerText = `▶ [Bulan ${state.month}] ${text}`;
-            logBox.prepend(item);
-        }
+    ev.options.forEach(opt => {
+      let b = document.createElement('button');
+      b.className = `modal-btn ${opt.class}`;
+      b.innerText = opt.text;
+      b.onclick = () => { opt.action(); updateUI(); };
+      actionsDiv.appendChild(b);
+    });
 
-        function resetGame() {
-            state = {
-                month: 1,
-                income: 3000000,
-                morale: 80,
-                wallets: {
-                    survival: 1500000,
-                    social: 600000,
-                    emergency: 600000,
-                    future: 300000
-                },
-                insuranceActive: false,
-                emergencyTarget: 4500000,
-                cfpScore: 65,
-                history: []
-            };
-            document.getElementById('log-box').innerHTML = '<div class="log-item">▶ Game di-reset. Karakter: First Jobber / Mahasiswa.</div>';
-            updateUI();
-        }
+    document.getElementById('event-modal').classList.remove('hidden');
+  }
 
-        // Initialize UI on load
-        updateUI();
-    </script>
+  function handleJudol(take) {
+    if(take) {
+      alert("Kamu KELAHAN! Uang Rp50.000 melayang sia-sia.");
+      state.cash -= 50000;
+    }
+    closeModal();
+    nextMonth();
+  }
+
+  function handleEmergency(useEmergency) {
+    if(useEmergency) {
+      if(state.emergency >= 100000) {
+        state.emergency -= 100000;
+        alert("Berhasil dibayar menggunakan Dana Darurat. Keuanganmu aman!");
+      } else {
+        alert("Dana Darurat tidak cukup! Kamu terpaksa terjerat Pinjol!");
+        state.debt += 130000;
+      }
+    } else {
+      state.debt += 130000;
+    }
+    closeModal();
+    nextMonth();
+  }
+
+  function closeModal() { document.getElementById('event-modal').classList.add('hidden'); }
+
+  function nextMonth() {
+    state.month++;
+    if(state.debt > 0) {
+      alert(`Awal Bulan: Uang saku Rp900.000 kamu dipotong otomatis Rp${state.debt.toLocaleString('id-ID')} untuk bayar Pinjol!`);
+      state.cash = 900000 - state.debt;
+      state.debt = 0;
+    } else {
+      state.cash = 900000;
+    }
+
+    if(state.month > 6) {
+      alert("Selamat! Kamu berhasil menyelesaikan 1 Semester.");
+      location.reload();
+    }
+    updateUI();
+  }
+
+  function updateUI() {
+    document.getElementById('ui-month').innerText = `${state.month} / 6`;
+    document.getElementById('ui-cash').innerText = "Rp" + state.cash.toLocaleString('id-ID');
+    document.getElementById('ui-emergency').innerText = "Rp" + state.emergency.toLocaleString('id-ID');
+    document.getElementById('ui-debt').innerText = "Rp" + state.debt.toLocaleString('id-ID');
+  }
+</script>
 </body>
 </html>
